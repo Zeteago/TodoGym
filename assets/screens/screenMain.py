@@ -25,6 +25,12 @@ class TelaInicial:
         #     cards.append(card)
             
         return cards
+    
+    def voltar(self, e):
+        from assets.screens.screenAdd import TelaAdicionar
+        self.page.controls.clear()
+        self.tela_adicionar = TelaAdicionar(self)
+        self.tela_adicionar.telaAdd()
 
     def PrimeiraTela(self):
         
@@ -65,7 +71,8 @@ class TelaInicial:
                                 text="Novo",
                                 inf="adiciona",
                                 width=200,
-                                height=50
+                                height=50,
+                                fun=self.voltar
                             )
                         ], 
                         alignment=ft.MainAxisAlignment.CENTER,

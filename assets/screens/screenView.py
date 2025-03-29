@@ -23,9 +23,9 @@ class TelaVisualizacao:
         ]
 
         rep = [
-            [15, 12, 10],
-            [12, 8, 8],
-            [12, 10, 8]
+            [12, 12, 10],
+            [12, 8, 10],
+            [12, 12, 10]
         ]
 
         layout = ft.Container(
@@ -70,13 +70,13 @@ class TelaVisualizacao:
                                                     ft.Row(
                                                         controls=[
                                                             ft.Text(
-                                                                value=f'{num+1}° Série: {val[n]}',
+                                                                value=f'{num+1}° Série: {val}',
                                                                 color='white',
                                                                 size=16
                                                             )
                                                         ],
                                                         alignment=ft.MainAxisAlignment.CENTER
-                                                    ) for num, val in enumerate(rep)
+                                                    ) for num, val in enumerate(rep[0])
                                                 ]
                                             ),
                                             ft.Divider(
