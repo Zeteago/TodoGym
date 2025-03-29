@@ -42,6 +42,12 @@ class CardTreino(ft.Container):
     def __init__(self, main, nome_treino="Nome do Treino", data="DD-MM-YYYY", id=None):
         self.main = main
         self.page = main.page
+
+        def navegar_para_visualizacao(e):
+            from assets.screens.screenView import TelaVisualizacao
+            self.page.controls.clear()
+            self.page.add(TelaVisualizacao(self.main, id).telaVisualizacao())
+
         super().__init__(
             content=ft.Container(
                 padding=ft.padding.only(left=5, right=5, top=5, bottom=5),
@@ -88,10 +94,7 @@ class CardTreino(ft.Container):
                                     text="Visualizar",
                                     inf="visualizar",
                                     expand=True,
-                                    fun=lambda e: (
-                                        self.page.controls.clear(),
-                                        self.page.add(TelaVisualizacao(self.main, id).telaVisualizacao())
-                                    )
+                                    fun=navegar_para_visualizacao
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,

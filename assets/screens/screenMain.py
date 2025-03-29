@@ -1,7 +1,6 @@
 import flet as ft
 from assets.database.operacao import Operacao
 from assets.components.botao import AddButtonSimpleAzul, AddButtonSimpleVerde, AddButtonSimpleVermelho
-from assets.style.estilo import BotaoEstilo
 from assets.components.botao import CardTreino
 
 class TelaInicial:
@@ -54,22 +53,10 @@ class TelaInicial:
                         ),
                         expand=True,
                         border=ft.Border(
-                            top=ft.BorderSide(
-                                color=ft.colors.WHITE,
-                                width=1
-                            ),
-                            left=ft.BorderSide(
-                                color=ft.colors.WHITE,
-                                width=1
-                            ),
-                            right=ft.BorderSide(
-                                color=ft.colors.WHITE,
-                                width=1
-                            ),
-                            bottom=ft.BorderSide(
-                                color=ft.colors.WHITE,
-                                width=1
-                            )
+                            top=ft.BorderSide(color=ft.colors.WHITE, width=1),
+                            left=ft.BorderSide(color=ft.colors.WHITE, width=1),
+                            right=ft.BorderSide(color=ft.colors.WHITE, width=1),
+                            bottom=ft.BorderSide(color=ft.colors.WHITE, width=1)
                         )
                     ),
                     ft.Row(
