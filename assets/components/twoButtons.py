@@ -56,5 +56,6 @@ class AddCancelCria(ft.Row):
         page = e.page
         page.controls.clear()
         from assets.screens.screenMain import TelaInicial
-        TelaInicial(e.control.parent.parent.parent.parent.parent).PrimeiraTela()
+        self.tela_inicial = TelaInicial(self)
+        self.tela_inicial.PrimeiraTela()
         page.update()

@@ -7,60 +7,42 @@ class ExercicioContainer(ft.Container):
         self.padding = ft.padding.only(left=5, right=5, top=5, bottom=5)
         self.series_containers = []
         
+        self.nome_exercicio = TtextField(f'Exercício {numero}', '')
+        
         def on_series_change(e):
-            self.atualizar_series(e.control.value)
+            num_series = e.control.value
+            if not num_series.isdigit():
+                return
+                
+            self.atualizar_series(int(num_series))
         
         self.content = ft.Column(
             controls=[
-                ft.ResponsiveRow(
-                    columns=3,
-                    controls=[
-                        ft.Row(
-                            col=1,
-                            controls=[
-                                ft.Text(
-                                    value=f'{numero}º Exercício',
-                                    size=18,
-                                    color='white'
-                                )
-                            ],
-                            vertical_alignment=ft.CrossAxisAlignment.CENTER
-                        ),
-                        TtextField('Nome', ''),
-                        NumericField('Séries', text='', mudou=on_series_change)
-                    ]
-                ),
-                ft.Column(  # Container para as séries
-                    controls=[],
-                    spacing=5
-                )
+                self.nome_exercicio,
+                NumericField('Séries', mudou=lambda x: on_series_change(x))
             ]
         )
         
-        self.border = ft.Border(
-            top=ft.BorderSide(color=ft.colors.WHITE, width=1),
-            left=ft.BorderSide(color=ft.colors.WHITE, width=1),
-            right=ft.BorderSide(color=ft.colors.WHITE, width=1),
-            bottom=ft.BorderSide(color=ft.colors.WHITE, width=1)
-        )
+        self.border = ft.border.all(1, ft.colors.WHITE)
 
-    def atualizar_series(self, numero):
-        if not numero.isdigit():
-            return
-            
-        series_column = self.content.controls[1]
-        series_column.controls.clear()
+    def atualizar_series(self, num_series):
+        series_column = ft.Column(spacing=5)
         self.series_containers.clear()
         
-        for i in range(int(numero)):
+        for i in range(num_series):
             serie = SeriesField(i+1)
             series_column.controls.append(serie)
             self.series_containers.append(serie)
-        
+            
+        if len(self.content.controls) > 2:
+            self.content.controls.pop()
+        self.content.controls.append(series_column)
         self.update()
 
     def get_nome_exercicio(self):
-        return self.content.controls[0].controls[1].get_valor()
+        """Returns exercise name"""
+        return self.nome_exercicio.get_valor()
 
     def get_series(self):
-        return [container.get_dados() for container in self.series_containers]
+        """Returns list of series data"""
+        return [serie.get_dados() for serie in self.series_containers]

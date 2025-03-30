@@ -9,46 +9,57 @@ class TelaAdicionar:
     def __init__(self, main):
         self.main = main
         self.page = main.page
-        self.db = Operacao(self)
+        self.db = Operacao()
         self.exercicios_containers = []
 
     def salvar_treino(self, e):
-        try:
-            # Pega data atual
-            data = datetime.now().strftime("%d/%m/%Y")
+        # Pega data atual
+        data = datetime.now().strftime("%d/%m/%Y")
+        
+        # Pega nome do treino
+        nome_treino = self._get_nome_treino()
+        if not nome_treino:
+            print("Nome do treino é obrigatório")
+            return
+        
+        # Insere treino e pega ID
+        treino_id = self.db.InserirTreino(nome_treino, data)
+        print(f"Treino criado com ID: {treino_id} eeee {self.exercicios_containers}")  # Debug
+        
+        # Para cada container de exercício
+        for container in self.exercicios_containers:
+            # Pega dados do exercício
+            nome_exercicio = container.get_nome_exercicio()
+            series = container.get_series()
+
+            print("OOOOOOOOOO", nome_exercicio, series)
             
-            # Pega nome do treino
-            nome_treino = self._get_nome_treino()
-            
-            # Insere treino e pega ID
-            treino_id = self.db.InserirTreino(nome_treino, data)
-            
-            # Para cada container de exercício
-            for container in self.exercicios_containers:
-                # Pega dados do exercício
-                nome_exercicio = container.get_nome_exercicio()
-                series = container.get_series()
+            if nome_exercicio != '' and series != None:
+                # Insere exercício e pega ID
+                num_series = len(series)
+                exercicio_id = self.db.InserirExercicio(treino_id, nome_exercicio, num_series)
+                print(f"Exercício {nome_exercicio} criado com ID: {exercicio_id}")  # Debug
                 
-                if nome_exercicio and series:
-                    # Insere exercício e pega ID
-                    exercicio_id = self.db.InserirExercicio(treino_id, nome_exercicio)
-                    
-                    # Insere cada série
-                    for num, serie in enumerate(series, 1):
+                # Insere cada série
+                for num, serie in enumerate(series, 1):
+                    try:
                         self.db.InserirSerie(
                             exercicio_id,
                             num,
-                            serie["repeticoes"],
-                            serie["peso"]
+                            int(serie["repeticoes"]),
+                            float(serie["peso"])
                         )
+                        print(f"Série {num} inserida para exercício {exercicio_id}")  # Debug
+                    except ValueError as ve:
+                        print(f"Erro ao converter valores da série: {ve}")
+                    except Exception as e:
+                        print(f"Erro ao inserir série: {e}")
+        
+        # Volta para tela inicial
+        self.page.controls.clear()
+        self.main.carregar()
+        self.page.update()
             
-            # Volta para tela inicial
-            self.page.controls.clear()
-            self.main.carregar()
-            self.page.update()
-            
-        except Exception as e:
-            print(f"Erro ao salvar treino: {e}")
 
     def _get_nome_treino(self):
         nome_field = self.page.controls[0].content.controls[1].content.controls[0].content.controls[0].content.controls[1]

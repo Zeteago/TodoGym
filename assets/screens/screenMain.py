@@ -7,27 +7,33 @@ class TelaInicial:
     def __init__(self, main):
         self.main = main
         self.page = main.page
-        self.db = Operacao(self)
+        self.db = Operacao()
 
     def carregar_treinos(self):
-        # Busca todos os treinos do banco
-        # treinos = self.operacao.buscar_todos_treinos()
-        cards = [
-            CardTreino(self.main, 'Peito e Tríceps', '29/03/2025', 0),
-            CardTreino(self.main, 'Costa e Bíceps', '28/03/2025', 1),
-            CardTreino(self.main, 'Perna e Ombro', '27/03/2025', 2),
-        ]
-        
-        # for treino in treinos:
-        #     card = CardTreino(
-        #         nome_treino=treino['nome'],
-        #         data=treino['data']
-        #     )
-        #     cards.append(card)
+        try:
+            treinos = self.db.BuscarTreinos()
+            cards = []
             
-        return cards
+            for treino in treinos:
+                card = CardTreino(
+                    self.main,
+                    nome_treino=treino[1],
+                    data=treino[2],
+                    id=treino[0]
+                )
+                cards.append(card)
+                
+            return cards if cards else [
+                ft.Text("Nenhum treino cadastrado", 
+                       color="white", 
+                       size=16,
+                       text_align=ft.TextAlign.CENTER)
+            ]
+        except Exception as e:
+            print(f"Erro ao carregar treinos: {e}")
+            return []
     
-    def voltar(self, e ):
+    def voltar(self, e):
         from assets.screens.screenAdd import TelaAdicionar
         self.page.controls.clear()
         self.tela_adicionar = TelaAdicionar(self)

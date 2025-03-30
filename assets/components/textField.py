@@ -170,8 +170,11 @@ class SeriesField(ft.ResponsiveRow):
         )
 
     def get_dados(self):
-        """Retorna os dados da série"""
+        """Returns series data with repetitions and weight"""
+        repeticoes = self.controls[1].controls[0].value or "0"
+        peso = self.controls[2].controls[0].value or "0"
+        
         return {
-            "repeticoes": self.controls[1].controls[0].value,
-            "peso": self.controls[2].controls[0].value
+            "repeticoes": int(repeticoes),
+            "peso": float(peso)
         }

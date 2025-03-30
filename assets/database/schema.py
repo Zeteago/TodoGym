@@ -5,7 +5,7 @@ def criar_banco():
     # Garante que o diretório db existe
     os.makedirs('assets/db', exist_ok=True)
     
-    conn = sqlite3.connect('assets/db/todo_gym.db')
+    conn = sqlite3.connect('assets/db/controle_fisico.db')
     cursor = conn.cursor()
 
     # Habilita foreign keys
