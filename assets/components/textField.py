@@ -108,7 +108,7 @@ class NumericField(ft.ResponsiveRow):
 class SeriesField(ft.ResponsiveRow):
     def __init__(self, num_serie):
         super().__init__(
-            columns=3,
+            columns=4,  # Aumentado para 4 colunas
             controls=[
                 ft.Row(
                     col=1,
@@ -122,7 +122,7 @@ class SeriesField(ft.ResponsiveRow):
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
                 ),
                 ft.Row(
-                    col=2,
+                    col=1,  # Coluna para repetições
                     controls=[
                         ft.TextField(
                             hint_text="Repetições",
@@ -134,6 +134,38 @@ class SeriesField(ft.ResponsiveRow):
                         )
                     ],
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
+                ),
+                ft.Row(
+                    col=1,  # Coluna para peso
+                    controls=[
+                        ft.TextField(
+                            hint_text="Peso (kg)",
+                            expand=True,
+                            border_color='white',
+                            text_style=ft.TextStyle(
+                                color='white'
+                            )
+                        )
+                    ],
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER
+                ),
+                ft.Row(
+                    col=1,
+                    controls=[
+                        ft.Text(
+                            "kg",
+                            size=16,
+                            color='white'
+                        )
+                    ],
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER
                 )
             ]
         )
+
+    def get_dados(self):
+        """Retorna os dados da série"""
+        return {
+            "repeticoes": self.controls[1].controls[0].value,
+            "peso": self.controls[2].controls[0].value
+        }

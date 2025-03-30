@@ -35,6 +35,7 @@ def criar_banco():
             exercicio_id INTEGER NOT NULL,
             numero_serie INTEGER NOT NULL,
             repeticoes INTEGER NOT NULL,
+            peso REAL NOT NULL DEFAULT 0,
             FOREIGN KEY (exercicio_id) REFERENCES Exercicios(id) ON DELETE CASCADE
         )
     """)

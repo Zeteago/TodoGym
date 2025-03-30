@@ -26,7 +26,7 @@ class TelaInicial:
             
         return cards
     
-    def voltar(self, e):
+    def voltar(self, e ):
         from assets.screens.screenAdd import TelaAdicionar
         self.page.controls.clear()
         self.tela_adicionar = TelaAdicionar(self)
