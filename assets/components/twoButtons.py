@@ -31,30 +31,30 @@ class AddBackEdit(ft.Row):
         )
         
 class AddCancelCria(ft.Row):
-    def __init__(self, on_voltar=None, on_editar=None):
-
-        def telaInicio(e):
-            from assets.screens.screenMain import TelaInicial
-            self.page.controls.clear()
-            self.tela_inicial = TelaInicial(self)
-            self.tela_inicial.PrimeiraTela()
-
+    def __init__(self, on_confirmar=None):
         super().__init__(
-            controls = [
+            controls=[
                 ft.ElevatedButton(
-                    text="Voltar",
+                    text="Cancelar",
                     style=BotaoEstilo.estilo_vermelho(),
                     expand=True,
                     height=50,
-                    on_click=telaInicio
+                    on_click=self._voltar
                 ),
                 ft.ElevatedButton(
                     text="Confirmar",
-                    style=BotaoEstilo.estilo_azul(),
+                    style=BotaoEstilo.estilo_verde(),
                     expand=True,
                     height=50,
-                    on_click=telaInicio
+                    on_click=on_confirmar
                 )
             ],
-            alignment = ft.MainAxisAlignment.SPACE_BETWEEN
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
         )
+
+    def _voltar(self, e):
+        page = e.page
+        page.controls.clear()
+        from assets.screens.screenMain import TelaInicial
+        TelaInicial(e.control.parent.parent.parent.parent.parent).PrimeiraTela()
+        page.update()

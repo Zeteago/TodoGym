@@ -9,7 +9,6 @@ class TelaVisualizacao:
         self.data = info
 
     def telaVisualizacao(self):
-
         cards = [
             ['Peito e Tríceps', '29/03/2025', 5],
             ['Costa e Bíceps', '28/03/2025', 4],
@@ -22,10 +21,11 @@ class TelaVisualizacao:
             ['Crossover', 3]
         ]
 
+        # Agora rep é uma lista de tuplas (repeticoes, peso)
         rep = [
-            [12, 12, 10],
-            [12, 8, 10],
-            [12, 12, 10]
+            [[12, 20], [12, 25], [10, 30]],  # Supino: aumentando peso por série
+            [[12, 15], [8, 20], [10, 20]],   # PeckDeck: mesmo peso nas últimas séries
+            [[12, 10], [12, 12], [10, 15]]   # Crossover: progressão leve
         ]
 
         layout = ft.Container(
@@ -70,13 +70,13 @@ class TelaVisualizacao:
                                                     ft.Row(
                                                         controls=[
                                                             ft.Text(
-                                                                value=f'{num+1}° Série: {val}',
+                                                                value=f'{num+1}° Série: {val[0]} rep - {val[1]}kg',
                                                                 color='white',
                                                                 size=16
                                                             )
                                                         ],
                                                         alignment=ft.MainAxisAlignment.CENTER
-                                                    ) for num, val in enumerate(rep[0])
+                                                    ) for num, val in enumerate(rep[n])  # Usando o índice n do exercício
                                                 ]
                                             ),
                                             ft.Divider(

@@ -2,9 +2,18 @@ import flet as ft
 
 class TtextField(ft.ResponsiveRow):
     def __init__(self, value, text, defini=None):
-
         valor = value if value != '' else ''
         texto = text if text != '' else ''
+        
+        # Guardar referência do TextField
+        self.input_field = ft.TextField(
+            value=f'{texto}',
+            expand=True,
+            border_color='white',
+            text_style=ft.TextStyle(
+                color='white'
+            )
+        )
 
         super().__init__(
             columns=3,
@@ -23,19 +32,16 @@ class TtextField(ft.ResponsiveRow):
                 ft.Row(
                     col=2,
                     controls=[
-                        ft.TextField(
-                            value=f'{texto}',
-                            expand=True,
-                            border_color='white',
-                            text_style=ft.TextStyle(
-                                color='white'
-                            )
-                        )
+                        self.input_field  # Usar a referência aqui
                     ],
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
                 )
             ]
         )
+
+    def get_valor(self):
+        """Retorna o valor do campo de texto"""
+        return self.input_field.value if self.input_field.value else ""
 
 class NumericField(ft.ResponsiveRow):
     def __init__(self, value, mudou, text='', defini=None):

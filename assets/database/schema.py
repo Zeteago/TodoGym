@@ -42,3 +42,5 @@ def criar_banco():
 
     conn.commit()
     conn.close()
+
+criar_banco()

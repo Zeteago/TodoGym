@@ -20,14 +20,28 @@ class Operacao:
         ''')
         self.conn.commit()
 
-    def InserirTreino(self):
-        pass
+    def InserirTreino(self, nome, data):
+        self.cursor.execute(
+            "INSERT INTO Treinos (nome, data) VALUES (?, ?)",
+            (nome, data)
+        )
+        self.conn.commit()
+        return self.cursor.lastrowid
 
-    def InserirExercicio(self):
-        pass
+    def InserirExercicio(self, treino_id, nome):
+        self.cursor.execute(
+            "INSERT INTO Exercicios (treino_id, nome) VALUES (?, ?)",
+            (treino_id, nome)
+        )
+        self.conn.commit()
+        return self.cursor.lastrowid
 
-    def InserirSerie(self):
-        pass
+    def InserirSerie(self, exercicio_id, numero_serie, repeticoes, peso):
+        self.cursor.execute(
+            "INSERT INTO Series (exercicio_id, numero_serie, repeticoes, peso) VALUES (?, ?, ?, ?)",
+            (exercicio_id, numero_serie, repeticoes, peso)
+        )
+        self.conn.commit()
 
     def AtualizarTreino(self):
         pass

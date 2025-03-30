@@ -7,6 +7,7 @@ class TelaInicial:
     def __init__(self, main):
         self.main = main
         self.page = main.page
+        self.db = Operacao(self)
 
     def carregar_treinos(self):
         # Busca todos os treinos do banco
@@ -31,6 +32,12 @@ class TelaInicial:
         self.page.controls.clear()
         self.tela_adicionar = TelaAdicionar(self)
         self.tela_adicionar.telaAdd()
+
+    def carregar(self):
+        """Recarrega a tela inicial com os treinos atualizados"""
+        self.page.controls.clear()
+        self.PrimeiraTela()
+        self.page.update()
 
     def PrimeiraTela(self):
         
