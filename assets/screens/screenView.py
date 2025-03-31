@@ -1,6 +1,6 @@
 import flet as ft
 from assets.database.operacao import Operacao
-from assets.components.twoButtons import AddBackEdit
+from assets.components.twoButtons import AddBack
 
 class TelaVisualizacao:
     def __init__(self, main, treino_id):
@@ -48,7 +48,7 @@ class TelaVisualizacao:
                         padding=20,
                         border=ft.border.all(1, ft.colors.WHITE)
                     ),
-                    AddBackEdit()
+                    AddBack(self.main)
                 ],
                 expand=True
             ),

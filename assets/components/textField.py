@@ -59,7 +59,8 @@ class NumericField(ft.ResponsiveRow):
             border_color='white',
             text_style=ft.TextStyle(
                 color='white'
-            )
+            ),
+            keyboard_type=ft.KeyboardType.NUMBER
         )
 
         def on_series_change(e):

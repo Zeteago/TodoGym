@@ -1,9 +1,12 @@
 import flet as ft
-from assets.screens.screenView import TelaVisualizacao
+import sqlite3
+import os
 
-class MudarTela:
-    def __init__(self, page):
-        self.page = page
-    
-    def mudar_tela(self, e, nova_tela):
-        pass
+os.makedirs('assets/db', exist_ok=True)
+conn = sqlite3.connect('assets/db/controle_fisico.db')
+cursor = conn.cursor()
+cursor.execute("PRAGMA foreign_keys = ON")
+
+for c in range(66, 70):
+    cursor.execute(f"DELETE FROM Exercicios WHERE id = {c}")
+    conn.commit()

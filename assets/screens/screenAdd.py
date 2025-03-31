@@ -76,11 +76,12 @@ class TelaAdicionar:
 
     def criar_serie_field(self, num):
         return ft.ResponsiveRow(
-            columns=4,
+            columns=5,
             controls=[
                 ft.Row(col=1, controls=[ft.Text(f"{num}ª Série", size=16, color='white')]),
-                ft.Row(col=1, controls=[ft.TextField(hint_text="Repetições", border_color='white', width=50)]),
-                ft.Row(col=1, controls=[ft.TextField(hint_text="Peso (kg)", border_color='white', width=50)]),
+                ft.Row(col=1, controls=[ft.TextField(hint_text="Repetições", border_color='white', width=50, keyboard_type=ft.KeyboardType.NUMBER)]),
+                ft.Row(col=1, controls=[ft.Text("rep", size=16, color='white')]),
+                ft.Row(col=1, controls=[ft.TextField(hint_text="Peso (kg)", border_color='white', width=50, keyboard_type=ft.KeyboardType.NUMBER)]),
                 ft.Row(col=1, controls=[ft.Text("kg", size=16, color='white')])
             ]
         )
@@ -90,10 +91,17 @@ class TelaAdicionar:
             padding=10,
             content=ft.Column([
                 ft.TextField(hint_text=f"Nome do Exercício {numero}", border_color='white'),
-                ft.TextField(
-                    hint_text="Número de séries",
-                    border_color='white',
-                    on_change=lambda e: self.atualizar_series(e, series_column)
+                ft.ResponsiveRow(
+                    columns=2,
+                    controls=[ 
+                        ft.Row(col=1, controls=[ft.Text("Número de séries", size=18, color="white"),]),
+                        ft.Row(col=1, controls=[ft.TextField(
+                            hint_text="Quantidade",
+                            border_color='white',
+                            on_change=lambda e: self.atualizar_series(e, series_column), 
+                            keyboard_type=ft.KeyboardType.NUMBER
+                        ),])
+                    ]
                 ),
                 ft.Column([], spacing=5) # series_column
             ]),
@@ -162,17 +170,28 @@ class TelaAdicionar:
 
         layout = ft.Container(
             padding=ft.padding.only(left=10, right=10, top=30, bottom=10),
-            content=ft.Column([
+            content=ft.Column(controls=[
                 ft.Text("Novo Treino", size=30, color="white"),
                 self.nome_treino,
-                ft.TextField(
-                    label="Número de exercícios",
-                    border_color="white",
-                    on_change=novos_exercicios
+                ft.ResponsiveRow(
+                    columns=2,
+                    controls=[ 
+                        ft.Text("Número de exercícios", size=18, color="white"),
+                        ft.TextField(
+                            label="Quantidade",
+                            border_color="white",
+                            on_change=novos_exercicios, 
+                            keyboard_type=ft.KeyboardType.NUMBER
+                        ),
+                    ]
                 ),
                 coluna_exercicios,
                 botoes  # Adicione os botões ao layout
-            ])
+            ],
+            scroll=ft.ScrollMode.HIDDEN,
+            expand=True
+            ),
+            expand=True
         )
 
         return self.page.add(layout)

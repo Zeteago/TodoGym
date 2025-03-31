@@ -71,11 +71,35 @@ class Operacao:
         """, (nome, data, treino_id))
         self.conn.commit()
 
-    def AtualizarExercicio(self):
-        pass
+    def AtualizarExercicio(self, exercicio_id, nome):
+        """Atualiza um exercício existente"""
+        try:
+            self.cursor.execute("""
+                UPDATE Exercicios 
+                SET nome = ?
+                WHERE id = ?
+            """, (nome, exercicio_id))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Erro ao atualizar exercício: {e}")
+            return False
 
-    def AtualizarSerie(self):
-        pass
+    def AtualizarSerie(self, serie_id, repeticoes, peso):
+        """Atualiza uma série existente"""
+        try:
+            self.cursor.execute("""
+                UPDATE Series 
+                SET repeticoes = ?, peso = ?
+                WHERE id = ?
+            """, (repeticoes, peso, serie_id))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Erro ao atualizar série: {e}")
+            return False
 
     def DeletarTreino(self, treino_id):
         try:
@@ -88,11 +112,39 @@ class Operacao:
             print(f"Erro ao deletar treino: {e}")
             raise e
 
-    def DeletarExercicio(self):
-        pass
+    def DeletarExercicio(self, exercicio_id):
+        try:
+            self.cursor.execute("PRAGMA foreign_keys = ON")
+            self.cursor.execute("DELETE FROM Exercicios WHERE id = ?", (exercicio_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Erro ao deletar exercício: {e}")
+            raise e
 
-    def DeletarSerie(self):
-        pass
+    def DeletarSerie(self, serie_id):
+        """Deleta uma série específica"""
+        try:
+            self.cursor.execute("DELETE FROM Series WHERE id = ?", (serie_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Erro ao deletar série: {e}")
+            return False
+
+    def DeletarExerciciosPorTreino(self, treino_id):
+        """Deleta todos os exercícios de um treino"""
+        try:
+            self.cursor.execute("PRAGMA foreign_keys = ON")
+            self.cursor.execute("DELETE FROM Exercicios WHERE treino_id = ?", (treino_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Erro ao deletar exercícios: {e}")
+            raise e
 
     def BuscarTreinos(self):
         self.cursor.execute("""
@@ -158,6 +210,52 @@ class Operacao:
         except Exception as e:
             print(f"Erro ao buscar treino: {e}")
             return None
+
+    def BuscarExerciciosPorTreino(self, treino_id):
+        """Busca todos os exercícios de um treino"""
+        try:
+            self.cursor.execute("""
+                SELECT id, treino_id, nome, num_series 
+                FROM Exercicios 
+                WHERE treino_id = ?
+            """, (treino_id,))
+            
+            exercicios = []
+            for row in self.cursor.fetchall():
+                exercicios.append({
+                    'id': row[0],
+                    'treino_id': row[1],
+                    'nome': row[2],
+                    'num_series': row[3]
+                })
+            return exercicios
+        except Exception as e:
+            print(f"Erro ao buscar exercícios: {e}")
+            return []
+
+    def BuscarSeriesPorExercicio(self, exercicio_id):
+        """Busca todas as séries de um exercício"""
+        try:
+            self.cursor.execute("""
+                SELECT id, exercicio_id, numero_serie, repeticoes, peso 
+                FROM Series 
+                WHERE exercicio_id = ?
+                ORDER BY numero_serie
+            """, (exercicio_id,))
+            
+            series = []
+            for row in self.cursor.fetchall():
+                series.append({
+                    'id': row[0],
+                    'exercicio_id': row[1],
+                    'numero_serie': row[2],
+                    'repeticoes': row[3],
+                    'peso': row[4]
+                })
+            return series
+        except Exception as e:
+            print(f"Erro ao buscar séries: {e}")
+            return []
 
     def _formatar_resultado(self, rows):
         """Formats database results into a nested dictionary"""

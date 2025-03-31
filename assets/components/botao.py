@@ -2,6 +2,7 @@ import flet as ft
 from assets.database.operacao import Operacao
 from assets.style.estilo import BotaoEstilo
 from assets.screens.screenView import TelaVisualizacao
+from assets.screens.screenEdit import TelaEdicao
 
 class AddButtonSimpleAzul(ft.ElevatedButton):
     def __init__(self, text, inf, width=30, height=30, expand=False, fun=None):
@@ -45,20 +46,41 @@ class CardTreino(ft.Container):
         self.page = main.page
         self.id = id
         self.db = Operacao()
+
+        def fechar_dialogo():
+            self.caixa_confirma.open = False  #FECHA O DIALOGO
+            self.page.update(self.page)
+
+        def popup(e):
+            self.caixa_confirma = ft.AlertDialog(
+                modal=True, #ATIVAR
+                title=ft.Text('Por favor, confirme.', color='white'), #FRASE PRINCIPAL
+                content=ft.Text('Tem certeza que deseja excluir?', color='white'), #EXPLICAÇÃO
+                actions=[ #ESCOLHAS DA CAIXA DE DIÁLOGO
+                    ft.TextButton('Sim', on_click=deletar_treino, data=e.control.data, style=ft.ButtonStyle(color={ft.ControlState.DEFAULT: 'blue'})),
+                    ft.TextButton('Não', on_click=lambda e: fechar_dialogo(), style=ft.ButtonStyle(color={ft.ControlState.DEFAULT: 'blue'}))
+                ],
+                actions_alignment=ft.MainAxisAlignment.END, #POSICIONAMENTO DAS OPC,
+                bgcolor='black'
+            )
+            self.page.open(self.caixa_confirma)
         
         def deletar_treino(e):
             try:
                 # Deleta o treino do banco (CASCADE irá deletar exercícios e séries)
                 self.db.DeletarTreino(self.id)
                 # Recarrega a tela principal
+                fechar_dialogo()
                 self.page.controls.clear()
                 
                 from assets.screens.screenMain import TelaInicial
                 self.page.controls.clear()
                 self.tela_inicial = TelaInicial(self)
                 self.tela_inicial.PrimeiraTela()
+                    
             except Exception as e:
                 print(f"Erro ao deletar treino: {e}")
+            
 
         super().__init__(
             content=ft.Container(
@@ -77,7 +99,7 @@ class CardTreino(ft.Container):
                                 AddButtonSimpleVermelho(
                                     text="X",
                                     inf="deletar",
-                                    fun=deletar_treino
+                                    fun=popup
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -98,13 +120,22 @@ class CardTreino(ft.Container):
                         ft.Row(
                             expand=True,
                             controls=[
-                                AddButtonSimpleVerde(
+                                AddButtonSimpleAzul(
                                     text="Visualizar",
                                     inf="visualizar",
                                     expand=True,
                                     fun=lambda e: (
                                         self.page.controls.clear(),
                                         self.page.add(TelaVisualizacao(self.main, id).telaVisualizacao())
+                                    )
+                                ),
+                                AddButtonSimpleVerde(
+                                    text="Editar",
+                                    inf="editar",
+                                    expand=True,
+                                    fun=lambda e: (
+                                        self.page.controls.clear(),
+                                        TelaEdicao(self.main, self.id).telaEdicao()
                                     )
                                 )
                             ],
