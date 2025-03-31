@@ -18,13 +18,6 @@ class AddBackEdit(ft.Row):
                     expand=True,
                     height=50,
                     on_click=muda
-                ),
-                ft.ElevatedButton(
-                    text="Editar",
-                    style=BotaoEstilo.estilo_azul(),
-                    expand=True,
-                    height=50,
-                    on_click=muda
                 )
             ],
             alignment = ft.MainAxisAlignment.SPACE_BETWEEN

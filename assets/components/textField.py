@@ -1,4 +1,5 @@
 import flet as ft
+from .series_field import SeriesField  # Importar a classe do arquivo correto
 
 class TtextField(ft.ResponsiveRow):
     def __init__(self, value, text, defini=None):
@@ -40,8 +41,7 @@ class TtextField(ft.ResponsiveRow):
         )
 
     def get_valor(self):
-        """Retorna o valor do campo de texto"""
-        return self.input_field.value if self.input_field.value else ""
+        return self.input_field.value
 
 class NumericField(ft.ResponsiveRow):
     def __init__(self, value, mudou, text='', defini=None):
@@ -111,70 +111,5 @@ class NumericField(ft.ResponsiveRow):
             ]
         )
 
-class SeriesField(ft.ResponsiveRow):
-    def __init__(self, num_serie):
-        super().__init__(
-            columns=4,  # Aumentado para 4 colunas
-            controls=[
-                ft.Row(
-                    col=1,
-                    controls=[
-                        ft.Text(
-                            value=f'{num_serie}ª Série',
-                            size=16,
-                            color='white'
-                        )
-                    ],
-                    vertical_alignment=ft.CrossAxisAlignment.CENTER
-                ),
-                ft.Row(
-                    col=1,  # Coluna para repetições
-                    controls=[
-                        ft.TextField(
-                            hint_text="Repetições",
-                            expand=True,
-                            border_color='white',
-                            text_style=ft.TextStyle(
-                                color='white'
-                            )
-                        )
-                    ],
-                    vertical_alignment=ft.CrossAxisAlignment.CENTER
-                ),
-                ft.Row(
-                    col=1,  # Coluna para peso
-                    controls=[
-                        ft.TextField(
-                            hint_text="Peso (kg)",
-                            expand=True,
-                            border_color='white',
-                            text_style=ft.TextStyle(
-                                color='white'
-                            )
-                        )
-                    ],
-                    vertical_alignment=ft.CrossAxisAlignment.CENTER
-                ),
-                ft.Row(
-                    col=1,
-                    controls=[
-                        ft.Text(
-                            "kg",
-                            size=16,
-                            color='white'
-                        )
-                    ],
-                    vertical_alignment=ft.CrossAxisAlignment.CENTER
-                )
-            ]
-        )
-
-    def get_dados(self):
-        """Returns series data with repetitions and weight"""
-        repeticoes = self.controls[1].controls[0].value or "0"
-        peso = self.controls[2].controls[0].value or "0"
-        
-        return {
-            "repeticoes": int(repeticoes),
-            "peso": float(peso)
-        }
+    def get_valor(self):
+        return self.input_numero.value

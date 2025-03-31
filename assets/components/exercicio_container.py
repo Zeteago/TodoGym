@@ -6,6 +6,8 @@ class ExercicioContainer(ft.Container):
         super().__init__()
         self.padding = ft.padding.only(left=5, right=5, top=5, bottom=5)
         self.series_containers = []
+        self.series = 0
+        self.total = []
         
         self.nome_exercicio = TtextField(f'Exercício {numero}', '')
         
@@ -33,6 +35,8 @@ class ExercicioContainer(ft.Container):
             serie = SeriesField(i+1)
             series_column.controls.append(serie)
             self.series_containers.append(serie)
+
+        self.series = num_series
             
         if len(self.content.controls) > 2:
             self.content.controls.pop()
@@ -40,9 +44,13 @@ class ExercicioContainer(ft.Container):
         self.update()
 
     def get_nome_exercicio(self):
-        """Returns exercise name"""
         return self.nome_exercicio.get_valor()
 
     def get_series(self):
-        """Returns list of series data"""
-        return [serie.get_dados() for serie in self.series_containers]
+
+        for serie in self.series_containers:
+            self.total.append([serie.get_rep(), serie.get_peso()])
+
+            print('get', serie.get_rep())
+
+        return self.total

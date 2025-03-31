@@ -1,4 +1,5 @@
 import flet as ft
+from assets.database.operacao import Operacao
 from assets.style.estilo import BotaoEstilo
 from assets.screens.screenView import TelaVisualizacao
 
@@ -42,6 +43,23 @@ class CardTreino(ft.Container):
     def __init__(self, main, nome_treino="Nome do Treino", data="DD-MM-YYYY", id=None):
         self.main = main
         self.page = main.page
+        self.id = id
+        self.db = Operacao()
+        
+        def deletar_treino(e):
+            try:
+                # Deleta o treino do banco (CASCADE irá deletar exercícios e séries)
+                self.db.DeletarTreino(self.id)
+                # Recarrega a tela principal
+                self.page.controls.clear()
+                
+                from assets.screens.screenMain import TelaInicial
+                self.page.controls.clear()
+                self.tela_inicial = TelaInicial(self)
+                self.tela_inicial.PrimeiraTela()
+            except Exception as e:
+                print(f"Erro ao deletar treino: {e}")
+
         super().__init__(
             content=ft.Container(
                 padding=ft.padding.only(left=5, right=5, top=5, bottom=5),
@@ -59,6 +77,7 @@ class CardTreino(ft.Container):
                                 AddButtonSimpleVermelho(
                                     text="X",
                                     inf="deletar",
+                                    fun=deletar_treino
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
@@ -79,11 +98,6 @@ class CardTreino(ft.Container):
                         ft.Row(
                             expand=True,
                             controls=[
-                                AddButtonSimpleAzul(
-                                    text="Editar",
-                                    inf="editar",
-                                    expand=True
-                                ),
                                 AddButtonSimpleVerde(
                                     text="Visualizar",
                                     inf="visualizar",

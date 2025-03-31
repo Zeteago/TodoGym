@@ -1,69 +1,115 @@
 import flet as ft
-from assets.database.operacao import Operacao
-from assets.components.twoButtons import AddCancelCria
-from assets.components.textField import TtextField, NumericField, SeriesField
 from datetime import datetime
-from assets.components.exercicio_container import ExercicioContainer
+from assets.database.operacao import Operacao
+from assets.components.botao import AddButtonSimpleAzul 
+from assets.style.estilo import BotaoEstilo
 
 class TelaAdicionar:
     def __init__(self, main):
         self.main = main
         self.page = main.page
         self.db = Operacao()
+        self.nome_treino = None
         self.exercicios_containers = []
+        
+        # Dicionário para armazenar dados do treino
+        self.treino_data = {
+            'nome': '',
+            'data': '',
+            'exercicios': []
+        }
+
+    def coletar_dados_treino(self):
+        exercicios = []
+        
+        # Percorre cada container de exercício
+        for container in self.exercicios_containers:
+            exercicio = {
+                'nome': container.content.controls[0].value,
+                'series': []
+            }
+            
+            # Percorre as séries do exercício
+            series_column = container.content.controls[2]
+            for serie in series_column.controls:
+                exercicio['series'].append({
+                    'repeticoes': serie.controls[1].controls[0].value,
+                    'peso': serie.controls[2].controls[0].value
+                })
+                
+            exercicios.append(exercicio)
+            
+        return exercicios
 
     def salvar_treino(self, e):
-        # Pega data atual
-        data = datetime.now().strftime("%d/%m/%Y")
+        # Coleta nome do treino
+        nome_treino = self.nome_treino.value
         
-        # Pega nome do treino
-        nome_treino = self._get_nome_treino()
         if not nome_treino:
-            print("Nome do treino é obrigatório")
+            self.page.snack_bar = ft.SnackBar(content=ft.Text("Nome do treino é obrigatório"))
+            self.page.snack_bar.open = True
+            self.page.update()
             return
-        
-        # Insere treino e pega ID
-        treino_id = self.db.InserirTreino(nome_treino, data)
-        print(f"Treino criado com ID: {treino_id} eeee {self.exercicios_containers}")  # Debug
-        
-        # Para cada container de exercício
-        for container in self.exercicios_containers:
-            # Pega dados do exercício
-            nome_exercicio = container.get_nome_exercicio()
-            series = container.get_series()
 
-            print("OOOOOOOOOO", nome_exercicio, series)
+        # Atualiza dados do treino
+        self.treino_data = {
+            'nome': nome_treino,
+            'data': datetime.now().strftime("%d/%m/%Y"),
+            'exercicios': self.coletar_dados_treino()
+        }
+
+        # Salva no banco de dados
+        try:
+            self.db.inserir_treino(self.treino_data)
+            self.page.snack_bar = ft.SnackBar(content=ft.Text("Treino salvo com sucesso!"))
+            self.page.snack_bar.open = True
+            self.page.update()
             
-            if nome_exercicio != '' and series != None:
-                # Insere exercício e pega ID
-                num_series = len(series)
-                exercicio_id = self.db.InserirExercicio(treino_id, nome_exercicio, num_series)
-                print(f"Exercício {nome_exercicio} criado com ID: {exercicio_id}")  # Debug
-                
-                # Insere cada série
-                for num, serie in enumerate(series, 1):
-                    try:
-                        self.db.InserirSerie(
-                            exercicio_id,
-                            num,
-                            int(serie["repeticoes"]),
-                            float(serie["peso"])
-                        )
-                        print(f"Série {num} inserida para exercício {exercicio_id}")  # Debug
-                    except ValueError as ve:
-                        print(f"Erro ao converter valores da série: {ve}")
-                    except Exception as e:
-                        print(f"Erro ao inserir série: {e}")
-        
-        # Volta para tela inicial
-        self.page.controls.clear()
-        self.main.carregar()
+            # Limpa a tela e volta para tela principal
+            self.page.controls.clear()
+            self.main.carregar()
+            self.page.update()
+        except Exception as e:
+            self.page.snack_bar = ft.SnackBar(content=ft.Text(f"Erro ao salvar: {str(e)}"))
+            self.page.snack_bar.open = True
+            self.page.update()
+
+    def criar_serie_field(self, num):
+        return ft.ResponsiveRow(
+            columns=4,
+            controls=[
+                ft.Row(col=1, controls=[ft.Text(f"{num}ª Série", size=16, color='white')]),
+                ft.Row(col=1, controls=[ft.TextField(hint_text="Repetições", border_color='white', width=50)]),
+                ft.Row(col=1, controls=[ft.TextField(hint_text="Peso (kg)", border_color='white', width=50)]),
+                ft.Row(col=1, controls=[ft.Text("kg", size=16, color='white')])
+            ]
+        )
+
+    def criar_exercicio_container(self, numero):
+        container = ft.Container(
+            padding=10,
+            content=ft.Column([
+                ft.TextField(hint_text=f"Nome do Exercício {numero}", border_color='white'),
+                ft.TextField(
+                    hint_text="Número de séries",
+                    border_color='white',
+                    on_change=lambda e: self.atualizar_series(e, series_column)
+                ),
+                ft.Column([], spacing=5) # series_column
+            ]),
+            border=ft.border.all(1, ft.colors.WHITE)
+        )
+        series_column = container.content.controls[-1]
+        return container
+
+    def atualizar_series(self, e, series_column):
+        if not e.control.value.isdigit():
+            return
+        num_series = int(e.control.value)
+        series_column.controls.clear()
+        for i in range(num_series):
+            series_column.controls.append(self.criar_serie_field(i+1))
         self.page.update()
-            
-
-    def _get_nome_treino(self):
-        nome_field = self.page.controls[0].content.controls[1].content.controls[0].content.controls[0].content.controls[1]
-        return nome_field.controls[1].controls[0].value
 
     def telaAdd(self):
         coluna_exercicios = ft.Column(
@@ -72,112 +118,66 @@ class TelaAdicionar:
             spacing=10
         )
 
-        def novos_exercicios(input_field):
-            numero = input_field.value
-            if not numero.isdigit():
+        # Campo para nome do treino
+        self.nome_treino = ft.TextField(
+            label="Nome do Treino",
+            border_color="white",
+            text_size=16
+        )
+
+        def novos_exercicios(e):
+            if not e.control.value.isdigit():
                 return
-            
+                
+            num = int(e.control.value)
             coluna_exercicios.controls.clear()
             self.exercicios_containers.clear()
             
-            for i in range(int(numero)):
-                container = ExercicioContainer(i+1)
-                coluna_exercicios.controls.append(container)
+            for i in range(num):
+                container = self.criar_exercicio_container(i+1)
                 self.exercicios_containers.append(container)
-            
+                coluna_exercicios.controls.append(container)
+                
             self.page.update()
+
+        botoes = ft.Row(
+            controls=[
+                AddButtonSimpleAzul(
+                    text="Voltar",
+                    inf="voltar",
+                    height=50,
+                    fun=lambda e: self.voltar(),
+                    expand=True
+                ),
+                ft.ElevatedButton(
+                    text="Salvar",
+                    on_click=self.salvar_treino,
+                    style=BotaoEstilo.estilo_verde(),
+                    expand=True,
+                    height=50
+                )
+            ],
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        )
 
         layout = ft.Container(
             padding=ft.padding.only(left=10, right=10, top=30, bottom=10),
-            expand=True,
-            content=ft.Column(
-                expand=True,
-                controls=[
-                    ft.Row(
-                        controls=[
-                            ft.Text(
-                                value='Treino',
-                                size=20,
-                                color='white'
-                            )
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER
-                    ),
-                    ft.Container(
-                        expand=True,
-                        content=ft.Column(
-                            expand=True,
-                            controls=[
-                                ft.Container(
-                                    padding=ft.padding.only(left=10, right=10, top=10, bottom=10),
-                                    expand=True,
-                                    content=ft.Column(
-                                        expand=True,
-                                        controls=[
-                                            ft.Container(
-                                                padding=ft.padding.only(left=5, right=5, top=5, bottom=5),
-                                                content=ft.Column(
-                                                    expand=True,
-                                                    controls=[
-                                                        ft.ResponsiveRow(
-                                                            columns=3,
-                                                            controls=[
-                                                                ft.Row(
-                                                                    col=1,
-                                                                    controls=[
-                                                                        ft.Text(
-                                                                            col=1,
-                                                                            value='Data',
-                                                                            size=18,
-                                                                            color='white'
-                                                                        ),
-                                                                    ],
-                                                                    vertical_alignment=ft.CrossAxisAlignment.CENTER
-                                                                ),                                                            
-                                                                ft.Row(
-                                                                    col=2,
-                                                                    controls=[
-                                                                        ft.ElevatedButton(
-                                                                            content=ft.Icon(
-                                                                                name=ft.icons.CALENDAR_MONTH,
-                                                                                size=30,
-                                                                                color='blue'
-                                                                            ),
-                                                                            bgcolor=ft.colors.GREY_900
-                                                                        )
-                                                                    ],
-                                                                    alignment=ft.MainAxisAlignment.CENTER,
-                                                                    vertical_alignment=ft.CrossAxisAlignment.CENTER
-                                                                )
-                                                            ]
-                                                        ),
-                                                        TtextField('Nome', ''),
-                                                        NumericField('Exercícios', mudou=novos_exercicios)  
-                                                    ]
-                                                ),
-                                                border=ft.Border(
-                                                    top=ft.BorderSide(color=ft.colors.WHITE, width=1),
-                                                    left=ft.BorderSide(color=ft.colors.WHITE, width=1),
-                                                    right=ft.BorderSide(color=ft.colors.WHITE, width=1),
-                                                    bottom=ft.BorderSide(color=ft.colors.WHITE, width=1)
-                                                ),
-                                            ),
-                                            coluna_exercicios
-                                        ]
-                                    ),
-                                    border=ft.Border(
-                                        top=ft.BorderSide(color=ft.colors.WHITE, width=1),
-                                        left=ft.BorderSide(color=ft.colors.WHITE, width=1),
-                                        right=ft.BorderSide(color=ft.colors.WHITE, width=1),
-                                        bottom=ft.BorderSide(color=ft.colors.WHITE, width=1)
-                                    )
-                                )
-                            ]
-                        )
-                    ),
-                    AddCancelCria(on_confirmar=self.salvar_treino)
-                ]
-            )
+            content=ft.Column([
+                ft.Text("Novo Treino", size=30, color="white"),
+                self.nome_treino,
+                ft.TextField(
+                    label="Número de exercícios",
+                    border_color="white",
+                    on_change=novos_exercicios
+                ),
+                coluna_exercicios,
+                botoes  # Adicione os botões ao layout
+            ])
         )
 
         return self.page.add(layout)
+
+    def voltar(self):
+        self.page.controls.clear()
+        self.main.carregar()
+        self.page.update()

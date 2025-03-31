@@ -1,0 +1,6 @@
+{
+    "name": "ControleFisico",
+    "short_name": "CF",
+    "start_url": ".",
+    "display": "standalone"
+}

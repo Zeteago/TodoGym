@@ -78,9 +78,15 @@ class Operacao:
         pass
 
     def DeletarTreino(self, treino_id):
-        """Deleta treino e cascata"""
-        self.cursor.execute("DELETE FROM Treinos WHERE id = ?", (treino_id,))
-        self.conn.commit()
+        try:
+            self.cursor.execute("PRAGMA foreign_keys = ON")
+            self.cursor.execute("DELETE FROM Treinos WHERE id = ?", (treino_id,))
+            self.conn.commit()
+            return True
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Erro ao deletar treino: {e}")
+            raise e
 
     def DeletarExercicio(self):
         pass
@@ -184,3 +190,51 @@ class Operacao:
                 })
 
         return treino
+
+    def inserir_treino(self, treino_data):
+        """Insere treino completo com exercícios e séries"""
+        try:
+            # Insere o treino
+            self.cursor.execute(
+                "INSERT INTO Treinos (nome, data) VALUES (?, ?)",
+                (treino_data['nome'], treino_data['data'])
+            )
+            treino_id = self.cursor.lastrowid
+            
+            # Insere exercícios
+            for exercicio in treino_data['exercicios']:
+                # Conta número de séries
+                num_series = len(exercicio['series'])
+                
+                self.cursor.execute(
+                    "INSERT INTO Exercicios (treino_id, nome, num_series) VALUES (?, ?, ?)",
+                    (treino_id, exercicio['nome'], num_series)
+                )
+                exercicio_id = self.cursor.lastrowid
+                
+                # Insere séries
+                for i, serie in enumerate(exercicio['series'], 1):
+                    self.cursor.execute("""
+                        INSERT INTO Series (exercicio_id, numero_serie, repeticoes, peso) 
+                        VALUES (?, ?, ?, ?)
+                    """, (
+                        exercicio_id,
+                        i,  # número da série
+                        serie['repeticoes'],
+                        serie['peso']
+                    ))
+            
+            self.conn.commit()
+            return True
+            
+        except Exception as e:
+            self.conn.rollback()
+            print(f"Erro ao inserir treino: {e}")
+            raise e
+
+    def __del__(self):
+        """Fecha a conexão quando o objeto é destruído"""
+        try:
+            self.conn.close()
+        except:
+            pass

@@ -2,8 +2,9 @@ import flet as ft
 
 class SeriesField(ft.ResponsiveRow):
     def __init__(self, num_serie):
+
         super().__init__(
-            columns=3,
+            columns=4,  # Increased to 4 columns
             controls=[
                 ft.Row(
                     col=1,
@@ -17,7 +18,7 @@ class SeriesField(ft.ResponsiveRow):
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
                 ),
                 ft.Row(
-                    col=2,
+                    col=1,
                     controls=[
                         ft.TextField(
                             hint_text="Repetições",
@@ -27,6 +28,27 @@ class SeriesField(ft.ResponsiveRow):
                                 color='white'
                             )
                         )
+                    ],
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER
+                ),
+                ft.Row(
+                    col=1,
+                    controls=[
+                        ft.TextField(
+                            hint_text="Peso (kg)",
+                            expand=True,
+                            border_color='white',
+                            text_style=ft.TextStyle(
+                                color='white'
+                            )
+                        )
+                    ],
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER
+                ),
+                ft.Row(
+                    col=1,
+                    controls=[
+                        ft.Text("kg", size=16, color='white')
                     ],
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
                 )

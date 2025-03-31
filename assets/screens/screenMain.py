@@ -24,10 +24,20 @@ class TelaInicial:
                 cards.append(card)
                 
             return cards if cards else [
-                ft.Text("Nenhum treino cadastrado", 
-                       color="white", 
-                       size=16,
-                       text_align=ft.TextAlign.CENTER)
+                ft.Container(
+                    content=ft.Row(
+                        controls=[
+                            ft.Text("Nenhum treino cadastrado", 
+                            color="white", 
+                            size=16,
+                            text_align=ft.TextAlign.CENTER
+                            ),
+                        ],
+                        expand=True,
+                        alignment=ft.MainAxisAlignment.CENTER
+                    ),
+                    expand=True
+                )
             ]
         except Exception as e:
             print(f"Erro ao carregar treinos: {e}")
