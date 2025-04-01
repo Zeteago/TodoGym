@@ -34,7 +34,7 @@ class TelaAdicionar:
             for serie in series_column.controls:
                 exercicio['series'].append({
                     'repeticoes': serie.controls[1].controls[0].value,
-                    'peso': serie.controls[2].controls[0].value
+                    'peso': serie.controls[3].controls[0].value
                 })
                 
             exercicios.append(exercicio)
